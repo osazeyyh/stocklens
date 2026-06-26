@@ -1,7 +1,7 @@
 export type Market = 'NGX' | 'US'
 export type StockTag = 'quick-trade' | 'long-hold' | 'hidden-gem'
 export type ChartRange = '1M' | '3M' | '6M' | '1Y' | '3Y' | '5Y'
-export type Period = '1Y' | '3Y' | '5Y'
+export type Period = '1M' | '3M' | '6M' | '1Y' | '3Y' | '5Y'
 
 export interface HistoricalPoint {
   date: string

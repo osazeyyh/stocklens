@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { subYears } from 'date-fns'
+import { subYears, subMonths } from 'date-fns'
 import { NGX_STOCKS } from '@/lib/ngx-stocks'
 import { US_STOCKS } from '@/lib/us-stocks'
 import { fetchHistoricalData } from '@/lib/yahoo-finance'
@@ -37,8 +37,10 @@ export async function GET(request: NextRequest) {
   const market = (searchParams.get('market') ?? 'NGX') as Market
   const period = (searchParams.get('period') ?? '1Y') as Period
 
-  const years = period === '1Y' ? 1 : period === '3Y' ? 3 : 5
-  const fromDate = subYears(new Date(), years)
+  const monthlyPeriods: Record<string, number> = { '1M': 1, '3M': 3, '6M': 6 }
+  const fromDate = period in monthlyPeriods
+    ? subMonths(new Date(), monthlyPeriods[period])
+    : subYears(new Date(), period === '1Y' ? 1 : period === '3Y' ? 3 : 5)
 
   const stocks = market === 'NGX' ? NGX_STOCKS : US_STOCKS
   const currency = market === 'NGX' ? 'NGN' : 'USD'
@@ -46,7 +48,8 @@ export async function GET(request: NextRequest) {
   const results = await Promise.allSettled(
     stocks.map(async (stock): Promise<StockResult | null> => {
       const history = await fetchHistoricalData(stock.ticker, fromDate)
-      if (history.length < 30) return null
+      const minPoints = period in monthlyPeriods ? 5 : 30
+      if (history.length < minPoints) return null
 
       const sorted = [...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       const startPrice = sorted[0].close
