@@ -14,11 +14,12 @@ import { Skeleton } from './ui/Skeleton'
 interface StockDetailDrawerProps {
   stock: StockResult | null
   amount: number
+  displayCurrency: 'NGN' | 'USD'
   open: boolean
   onClose: () => void
 }
 
-export function StockDetailDrawer({ stock, amount, open, onClose }: StockDetailDrawerProps) {
+export function StockDetailDrawer({ stock, amount, displayCurrency, open, onClose }: StockDetailDrawerProps) {
   const [detail, setDetail] = useState<StockDetail | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -100,10 +101,10 @@ export function StockDetailDrawer({ stock, amount, open, onClose }: StockDetailD
               }}
             >
               <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                Your {formatCurrency(amount, stock.currency)} would have become
+                Your {formatCurrency(amount, displayCurrency)} would have become
               </p>
               <p className="text-3xl font-bold text-white tabular-nums">
-                {formatCurrency(projectedValue, stock.currency)}
+                {formatCurrency(projectedValue, displayCurrency)}
               </p>
               <div className="flex items-center gap-2 flex-wrap">
                 <span
@@ -111,10 +112,10 @@ export function StockDetailDrawer({ stock, amount, open, onClose }: StockDetailD
                   style={{ color: isPositive ? '#00E5A0' : '#FF4D6A' }}
                 >
                   {isPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                  {formatPercent(stock.historicalReturn * 100)} over {stock.market === 'NGX' ? 'this period' : 'this period'}
+                  {formatPercent(stock.historicalReturn * 100)} over this period
                 </span>
                 <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                  ({isPositive ? '+' : ''}{formatCurrency(Math.abs(gain), stock.currency, true)})
+                  ({isPositive ? '+' : ''}{formatCurrency(Math.abs(gain), displayCurrency, true)})
                 </span>
               </div>
             </div>
@@ -137,7 +138,7 @@ export function StockDetailDrawer({ stock, amount, open, onClose }: StockDetailD
             {/* Stock metadata */}
             {!loading && detail && (
               <>
-                <StockMeta detail={detail} />
+                <StockMeta detail={detail} displayCurrency={displayCurrency} />
                 <HoldPeriodAnalysis history={detail.historical} />
               </>
             )}

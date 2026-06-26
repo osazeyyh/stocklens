@@ -11,6 +11,7 @@ type Filter = 'all' | StockTag
 interface StockGridProps {
   stocks: StockResult[]
   amount: number
+  displayCurrency: 'NGN' | 'USD'
   isLoading: boolean
   error?: string | null
   onSelectStock: (stock: StockResult) => void
@@ -23,7 +24,7 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: 'hidden-gem', label: '💎 Hidden Gems' },
 ]
 
-export function StockGrid({ stocks, amount, isLoading, error, onSelectStock }: StockGridProps) {
+export function StockGrid({ stocks, amount, displayCurrency, isLoading, error, onSelectStock }: StockGridProps) {
   const [filter, setFilter] = useState<Filter>('all')
 
   const filtered = filter === 'all' ? stocks : stocks.filter(s => s.tag === filter)
@@ -100,6 +101,7 @@ export function StockGrid({ stocks, amount, isLoading, error, onSelectStock }: S
               key={stock.ticker}
               stock={stock}
               amount={amount}
+              displayCurrency={displayCurrency}
               onClick={() => onSelectStock(stock)}
             />
           ))}

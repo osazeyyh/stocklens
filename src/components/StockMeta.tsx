@@ -1,18 +1,27 @@
 import type { StockDetail } from '@/types/stock'
 import { formatLargeNumber, formatCurrency, formatPercent } from '@/lib/format'
+import { convertCurrency } from '@/lib/fx'
 import { EducationCard } from './EducationCard'
 
 interface StockMetaProps {
   detail: StockDetail
+  displayCurrency: 'NGN' | 'USD'
 }
 
-export function StockMeta({ detail }: StockMetaProps) {
+export function StockMeta({ detail, displayCurrency }: StockMetaProps) {
+  function conv(v: number) {
+    return convertCurrency(v, detail.currency, displayCurrency)
+  }
+
+  const currentPrice = conv(detail.currentPrice)
+  const dayChange = conv(detail.dayChange)
+
   const items = [
     {
       label: 'Current Price',
-      value: formatCurrency(detail.currentPrice, detail.currency),
-      sub: `${detail.dayChange >= 0 ? '+' : ''}${detail.dayChange.toFixed(2)} (${formatPercent(detail.dayChangePct)})`,
-      subColor: detail.dayChange >= 0 ? '#00E5A0' : '#FF4D6A',
+      value: formatCurrency(currentPrice, displayCurrency),
+      sub: `${dayChange >= 0 ? '+' : ''}${formatCurrency(Math.abs(dayChange), displayCurrency, true)} (${formatPercent(detail.dayChangePct)})`,
+      subColor: dayChange >= 0 ? '#00E5A0' : '#FF4D6A',
       edu: null,
     },
     {
@@ -24,7 +33,7 @@ export function StockMeta({ detail }: StockMetaProps) {
     },
     {
       label: 'Market Cap',
-      value: detail.marketCap ? formatLargeNumber(detail.marketCap, detail.currency) : '—',
+      value: detail.marketCap ? formatLargeNumber(conv(detail.marketCap), displayCurrency) : '—',
       sub: null,
       subColor: null,
       edu: 'market-cap' as const,
@@ -38,14 +47,14 @@ export function StockMeta({ detail }: StockMetaProps) {
     },
     {
       label: '52W High',
-      value: detail.week52High ? formatCurrency(detail.week52High, detail.currency, true) : '—',
+      value: detail.week52High ? formatCurrency(conv(detail.week52High), displayCurrency, true) : '—',
       sub: null,
       subColor: null,
       edu: null,
     },
     {
       label: '52W Low',
-      value: detail.week52Low ? formatCurrency(detail.week52Low, detail.currency, true) : '—',
+      value: detail.week52Low ? formatCurrency(conv(detail.week52Low), displayCurrency, true) : '—',
       sub: null,
       subColor: null,
       edu: null,

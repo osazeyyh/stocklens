@@ -11,6 +11,7 @@ import { EducationCard } from './EducationCard'
 interface StockCardProps {
   stock: StockResult
   amount: number
+  displayCurrency: 'NGN' | 'USD'
   onClick: () => void
 }
 
@@ -20,7 +21,7 @@ const TAG_CONFIG = {
   'hidden-gem': { icon: Gem, label: '💎 Hidden Gem', variant: 'green' as const, edu: 'hidden-gem' as const },
 }
 
-export function StockCard({ stock, amount, onClick }: StockCardProps) {
+export function StockCard({ stock, amount, displayCurrency, onClick }: StockCardProps) {
   const projectedValue = Math.round(amount * stock.historicalReturnFactor)
   const gain = projectedValue - amount
   const isPositive = stock.historicalReturn >= 0
@@ -59,7 +60,7 @@ export function StockCard({ stock, amount, onClick }: StockCardProps) {
       <div className="space-y-1">
         <div className="flex items-baseline gap-2 flex-wrap">
           <span className="text-2xl font-bold tabular-nums text-white">
-            {formatCurrency(projectedValue, stock.currency)}
+            {formatCurrency(projectedValue, displayCurrency)}
           </span>
           <span
             className="text-sm font-semibold flex items-center gap-0.5"
@@ -71,7 +72,7 @@ export function StockCard({ stock, amount, onClick }: StockCardProps) {
         </div>
         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
           {isPositive ? '+' : ''}
-          {formatCurrency(Math.abs(gain), stock.currency, true)} gain
+          {formatCurrency(Math.abs(gain), displayCurrency, true)} gain
         </p>
       </div>
 

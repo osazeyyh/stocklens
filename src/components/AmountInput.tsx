@@ -1,18 +1,24 @@
 'use client'
 
 import * as SliderPrimitive from '@radix-ui/react-slider'
-import type { Market } from '@/types/stock'
+import { cn } from '@/lib/utils'
 
 interface AmountInputProps {
   value: number
   onChange: (amount: number) => void
-  market: Market
+  displayCurrency: 'NGN' | 'USD'
+  onCurrencyChange: (c: 'NGN' | 'USD') => void
 }
 
-const NGN_MIN = 100_000
-const NGN_MAX = 100_000_000
-const USD_MIN = 100
-const USD_MAX = 100_000
+const BOUNDS = {
+  NGN: { min: 100_000, max: 100_000_000 },
+  USD: { min: 100, max: 100_000 },
+}
+
+const QUICK_AMOUNTS = {
+  NGN: [100_000, 500_000, 1_000_000, 5_000_000, 10_000_000],
+  USD: [500, 1_000, 5_000, 10_000, 50_000],
+}
 
 function logToLinear(logVal: number, min: number, max: number): number {
   return Math.round(min * Math.pow(max / min, logVal / 100))
@@ -24,8 +30,8 @@ function linearToLog(val: number, min: number, max: number): number {
   return (Math.log(val / min) / Math.log(max / min)) * 100
 }
 
-function formatInput(value: number, market: Market): string {
-  const prefix = market === 'NGX' ? '₦' : '$'
+function formatInput(value: number, currency: 'NGN' | 'USD'): string {
+  const prefix = currency === 'NGN' ? '₦' : '$'
   return `${prefix}${value.toLocaleString()}`
 }
 
@@ -34,11 +40,10 @@ function parseInput(raw: string): number {
   return parseInt(digits || '0', 10)
 }
 
-export function AmountInput({ value, onChange, market }: AmountInputProps) {
-  const min = market === 'NGX' ? NGN_MIN : USD_MIN
-  const max = market === 'NGX' ? NGN_MAX : USD_MAX
+export function AmountInput({ value, onChange, displayCurrency, onCurrencyChange }: AmountInputProps) {
+  const { min, max } = BOUNDS[displayCurrency]
   const sliderVal = linearToLog(value, min, max)
-  const currency = market === 'NGX' ? '₦' : '$'
+  const symbol = displayCurrency === 'NGN' ? '₦' : '$'
 
   function handleSlider([pos]: number[]) {
     onChange(logToLinear(pos, min, max))
@@ -49,27 +54,48 @@ export function AmountInput({ value, onChange, market }: AmountInputProps) {
     onChange(Math.min(Math.max(raw, min), max))
   }
 
-  const quickAmounts =
-    market === 'NGX'
-      ? [100_000, 500_000, 1_000_000, 5_000_000, 10_000_000]
-      : [500, 1_000, 5_000, 10_000, 50_000]
-
   return (
     <div
       className="rounded-2xl p-6 space-y-5"
       style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)' }}
     >
-      <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
-          If you invested
-        </p>
-        <input
-          type="text"
-          value={formatInput(value, market)}
-          onChange={handleInput}
-          className="w-full bg-transparent text-4xl font-bold tracking-tight outline-none"
-          style={{ color: 'var(--text-primary)' }}
-        />
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 space-y-1 min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+            If you invested
+          </p>
+          <input
+            type="text"
+            value={formatInput(value, displayCurrency)}
+            onChange={handleInput}
+            className="w-full bg-transparent text-4xl font-bold tracking-tight outline-none"
+            style={{ color: 'var(--text-primary)' }}
+          />
+        </div>
+
+        {/* Currency toggle */}
+        <div
+          className="flex rounded-xl p-1 gap-1 shrink-0 mt-5"
+          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-color)' }}
+        >
+          {(['NGN', 'USD'] as const).map(c => (
+            <button
+              key={c}
+              onClick={() => onCurrencyChange(c)}
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200',
+                displayCurrency === c ? 'text-[#040812]' : 'text-[#8B9BB4] hover:text-white',
+              )}
+              style={
+                displayCurrency === c
+                  ? { background: 'linear-gradient(135deg, #00E5A0, #3D7BFF)' }
+                  : {}
+              }
+            >
+              {c === 'NGN' ? '₦' : '$'}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Logarithmic slider */}
@@ -97,13 +123,13 @@ export function AmountInput({ value, onChange, market }: AmountInputProps) {
       </SliderPrimitive.Root>
 
       <div className="flex items-center justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
-        <span>{currency}{(min / 1000).toFixed(0)}K</span>
-        <span>{currency}{(max / 1_000_000).toFixed(0)}M</span>
+        <span>{symbol}{(min / 1000).toFixed(0)}K</span>
+        <span>{symbol}{(max / 1_000_000) >= 1 ? `${max / 1_000_000}M` : `${max / 1_000}K`}</span>
       </div>
 
       {/* Quick amounts */}
       <div className="flex flex-wrap gap-2">
-        {quickAmounts.map(amt => (
+        {QUICK_AMOUNTS[displayCurrency].map(amt => (
           <button
             key={amt}
             onClick={() => onChange(amt)}
@@ -114,13 +140,9 @@ export function AmountInput({ value, onChange, market }: AmountInputProps) {
               border: `1px solid ${value === amt ? 'rgba(0,229,160,0.4)' : 'var(--border-color)'}`,
             }}
           >
-            {market === 'NGX'
-              ? amt >= 1_000_000
-                ? `₦${amt / 1_000_000}M`
-                : `₦${amt / 1_000}K`
-              : amt >= 1_000
-              ? `$${amt / 1_000}K`
-              : `$${amt}`}
+            {displayCurrency === 'NGN'
+              ? amt >= 1_000_000 ? `₦${amt / 1_000_000}M` : `₦${amt / 1_000}K`
+              : amt >= 1_000 ? `$${amt / 1_000}K` : `$${amt}`}
           </button>
         ))}
       </div>

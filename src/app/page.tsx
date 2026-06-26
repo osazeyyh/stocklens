@@ -8,6 +8,7 @@ import { StockGrid } from '@/components/StockGrid'
 import { StockDetailDrawer } from '@/components/StockDetailDrawer'
 import { TooltipProvider } from '@/components/ui/Tooltip'
 import { DateRangePicker } from '@/components/DateRangePicker'
+import { formatCurrency } from '@/lib/format'
 
 function toISODate(d: Date) {
   return d.toISOString().split('T')[0]
@@ -18,6 +19,7 @@ export default function Home() {
   const [period, setPeriod] = useState<Period>('1Y')
   const [customFrom, setCustomFrom] = useState(() => toISODate(new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)))
   const [customTo, setCustomTo] = useState(() => toISODate(new Date()))
+  const [displayCurrency, setDisplayCurrency] = useState<'NGN' | 'USD'>('NGN')
   const [amount, setAmount] = useState(10_000_000)
   const [stocks, setStocks] = useState<StockResult[]>([])
   const [loading, setLoading] = useState(true)
@@ -50,10 +52,16 @@ export default function Home() {
     fetchStocks()
   }, [fetchStocks])
 
-  // When switching markets, set a sensible default amount
   function handleMarketChange(m: Market) {
     setMarket(m)
-    setAmount(m === 'NGX' ? 10_000_000 : 10_000)
+    const nativeCurrency = m === 'NGX' ? 'NGN' : 'USD'
+    setDisplayCurrency(nativeCurrency)
+    setAmount(nativeCurrency === 'NGN' ? 10_000_000 : 10_000)
+  }
+
+  function handleCurrencyChange(c: 'NGN' | 'USD') {
+    setDisplayCurrency(c)
+    setAmount(c === 'NGN' ? 10_000_000 : 10_000)
   }
 
   function handleSelectStock(stock: StockResult) {
@@ -61,7 +69,6 @@ export default function Home() {
     setDrawerOpen(true)
   }
 
-  const currency = market === 'NGX' ? 'NGN' : 'USD'
   const topStock = stocks[0]
 
   return (
@@ -94,7 +101,12 @@ export default function Home() {
 
         <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
           {/* Amount input */}
-          <AmountInput value={amount} onChange={setAmount} market={market} />
+          <AmountInput
+            value={amount}
+            onChange={setAmount}
+            displayCurrency={displayCurrency}
+            onCurrencyChange={handleCurrencyChange}
+          />
 
           {/* Top-stock teaser (only when data loaded) */}
           {topStock && !loading && (
@@ -111,11 +123,11 @@ export default function Home() {
               <p className="text-white font-bold">
                 {topStock.name} would have turned your{' '}
                 <span style={{ color: '#00E5A0' }}>
-                  {currency === 'NGN' ? '₦' : '$'}{amount.toLocaleString()}
+                  {formatCurrency(amount, displayCurrency)}
                 </span>{' '}
                 into{' '}
                 <span style={{ color: '#00E5A0' }}>
-                  {currency === 'NGN' ? '₦' : '$'}{Math.round(amount * topStock.historicalReturnFactor).toLocaleString()}
+                  {formatCurrency(Math.round(amount * topStock.historicalReturnFactor), displayCurrency)}
                 </span>{' '}
                 {period === 'custom' ? `from ${customFrom} to ${customTo}` : `over the last ${period}`} — a{' '}
                 <span style={{ color: '#00E5A0' }}>
@@ -147,6 +159,7 @@ export default function Home() {
           <StockGrid
             stocks={stocks}
             amount={amount}
+            displayCurrency={displayCurrency}
             isLoading={loading}
             error={error}
             onSelectStock={handleSelectStock}
@@ -158,6 +171,9 @@ export default function Home() {
               Returns shown are historical and calculated from Yahoo Finance data.
               Past performance does not guarantee future results.
               This tool is for educational purposes only — not financial advice.
+              {displayCurrency !== (market === 'NGX' ? 'NGN' : 'USD') && (
+                <> Currency conversion uses an approximate rate and is for reference only.</>
+              )}
             </p>
           </div>
         </div>
@@ -166,6 +182,7 @@ export default function Home() {
         <StockDetailDrawer
           stock={selectedStock}
           amount={amount}
+          displayCurrency={displayCurrency}
           open={drawerOpen}
           onClose={() => setDrawerOpen(false)}
         />
