@@ -81,6 +81,18 @@ export function MarketPeriodToggle({
             {p}
           </button>
         ))}
+        <div className="w-px h-4 mx-0.5 shrink-0" style={{ background: 'var(--border-color)' }} />
+        <button
+          onClick={() => onPeriodChange('custom')}
+          className={cn(
+            'px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+            period === 'custom'
+              ? 'bg-[rgba(255,255,255,0.1)] text-white'
+              : 'text-[#8B9BB4] hover:text-white',
+          )}
+        >
+          Custom
+        </button>
       </div>
     </div>
   )

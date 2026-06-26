@@ -7,10 +7,17 @@ import { AmountInput } from '@/components/AmountInput'
 import { StockGrid } from '@/components/StockGrid'
 import { StockDetailDrawer } from '@/components/StockDetailDrawer'
 import { TooltipProvider } from '@/components/ui/Tooltip'
+import { DateRangePicker } from '@/components/DateRangePicker'
+
+function toISODate(d: Date) {
+  return d.toISOString().split('T')[0]
+}
 
 export default function Home() {
   const [market, setMarket] = useState<Market>('NGX')
   const [period, setPeriod] = useState<Period>('1Y')
+  const [customFrom, setCustomFrom] = useState(() => toISODate(new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)))
+  const [customTo, setCustomTo] = useState(() => toISODate(new Date()))
   const [amount, setAmount] = useState(10_000_000)
   const [stocks, setStocks] = useState<StockResult[]>([])
   const [loading, setLoading] = useState(true)
@@ -19,10 +26,16 @@ export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   const fetchStocks = useCallback(async () => {
+    if (period === 'custom' && (!customFrom || !customTo)) return
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`/api/top-stocks?market=${market}&period=${period}`)
+      const params = new URLSearchParams({ market, period })
+      if (period === 'custom') {
+        params.set('from', customFrom)
+        params.set('to', customTo)
+      }
+      const res = await fetch(`/api/top-stocks?${params}`)
       if (!res.ok) throw new Error('Failed to fetch')
       const data: StockResult[] = await res.json()
       setStocks(data)
@@ -31,7 +44,7 @@ export default function Home() {
     } finally {
       setLoading(false)
     }
-  }, [market, period])
+  }, [market, period, customFrom, customTo])
 
   useEffect(() => {
     fetchStocks()
@@ -104,7 +117,7 @@ export default function Home() {
                 <span style={{ color: '#00E5A0' }}>
                   {currency === 'NGN' ? '₦' : '$'}{Math.round(amount * topStock.historicalReturnFactor).toLocaleString()}
                 </span>{' '}
-                over the last {period} — a{' '}
+                {period === 'custom' ? `from ${customFrom} to ${customTo}` : `over the last ${period}`} — a{' '}
                 <span style={{ color: '#00E5A0' }}>
                   +{(topStock.historicalReturn * 100).toFixed(1)}% return
                 </span>
@@ -119,6 +132,16 @@ export default function Home() {
             onMarketChange={handleMarketChange}
             onPeriodChange={setPeriod}
           />
+
+          {/* Custom date range picker */}
+          {period === 'custom' && (
+            <DateRangePicker
+              from={customFrom}
+              to={customTo}
+              onFromChange={setCustomFrom}
+              onToChange={setCustomTo}
+            />
+          )}
 
           {/* Stock grid */}
           <StockGrid

@@ -37,10 +37,16 @@ export async function GET(request: NextRequest) {
   const market = (searchParams.get('market') ?? 'NGX') as Market
   const period = (searchParams.get('period') ?? '1Y') as Period
 
+  const fromParam = searchParams.get('from')
+  const toParam = searchParams.get('to')
+
   const monthlyPeriods: Record<string, number> = { '1M': 1, '3M': 3, '6M': 6 }
-  const fromDate = period in monthlyPeriods
-    ? subMonths(new Date(), monthlyPeriods[period])
-    : subYears(new Date(), period === '1Y' ? 1 : period === '3Y' ? 3 : 5)
+  const fromDate = fromParam
+    ? new Date(fromParam)
+    : period in monthlyPeriods
+      ? subMonths(new Date(), monthlyPeriods[period])
+      : subYears(new Date(), period === '1Y' ? 1 : period === '3Y' ? 3 : 5)
+  const toDate = toParam ? new Date(toParam) : new Date()
 
   const stocks = market === 'NGX' ? NGX_STOCKS : US_STOCKS
   const currency = market === 'NGX' ? 'NGN' : 'USD'
@@ -48,10 +54,14 @@ export async function GET(request: NextRequest) {
   const results = await Promise.allSettled(
     stocks.map(async (stock): Promise<StockResult | null> => {
       const history = await fetchHistoricalData(stock.ticker, fromDate)
-      const minPoints = period in monthlyPeriods ? 5 : 30
+      const minPoints = period in monthlyPeriods || fromParam ? 5 : 30
       if (history.length < minPoints) return null
 
-      const sorted = [...history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      const sorted = [...history]
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .filter(p => new Date(p.date) <= toDate)
+      if (sorted.length < minPoints) return null
+
       const startPrice = sorted[0].close
       const endPrice = sorted[sorted.length - 1].close
       if (startPrice <= 0) return null
