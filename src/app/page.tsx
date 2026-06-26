@@ -104,7 +104,7 @@ export default function Home() {
                 <span style={{ color: '#00E5A0' }}>
                   {currency === 'NGN' ? '₦' : '$'}{Math.round(amount * topStock.historicalReturnFactor).toLocaleString()}
                 </span>{' '}
-                — a{' '}
+                over the last {period} — a{' '}
                 <span style={{ color: '#00E5A0' }}>
                   +{(topStock.historicalReturn * 100).toFixed(1)}% return
                 </span>

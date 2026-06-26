@@ -10,7 +10,8 @@ interface MarketPeriodToggleProps {
   onPeriodChange: (p: Period) => void
 }
 
-const PERIODS: Period[] = ['1Y', '3Y', '5Y']
+const MONTH_PERIODS: Period[] = ['1M', '3M', '6M']
+const YEAR_PERIODS: Period[] = ['1Y', '3Y', '5Y']
 
 export function MarketPeriodToggle({
   market,
@@ -48,15 +49,30 @@ export function MarketPeriodToggle({
 
       {/* Period selector */}
       <div
-        className="flex rounded-xl p-1 gap-1"
+        className="flex rounded-xl p-1 gap-1 items-center"
         style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)' }}
       >
-        {PERIODS.map(p => (
+        {MONTH_PERIODS.map(p => (
           <button
             key={p}
             onClick={() => onPeriodChange(p)}
             className={cn(
-              'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+              'px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+              period === p
+                ? 'bg-[rgba(255,255,255,0.1)] text-white'
+                : 'text-[#8B9BB4] hover:text-white',
+            )}
+          >
+            {p}
+          </button>
+        ))}
+        <div className="w-px h-4 mx-0.5 shrink-0" style={{ background: 'var(--border-color)' }} />
+        {YEAR_PERIODS.map(p => (
+          <button
+            key={p}
+            onClick={() => onPeriodChange(p)}
+            className={cn(
+              'px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
               period === p
                 ? 'bg-[rgba(255,255,255,0.1)] text-white'
                 : 'text-[#8B9BB4] hover:text-white',
