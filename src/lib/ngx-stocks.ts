@@ -1,0 +1,26 @@
+import type { StockInfo } from '@/types/stock'
+
+export const NGX_STOCKS: StockInfo[] = [
+  { ticker: 'DANGCEM.LG', name: 'Dangote Cement', sector: 'Materials', market: 'NGX' },
+  { ticker: 'MTNN.LG', name: 'MTN Nigeria', sector: 'Telecom', market: 'NGX' },
+  { ticker: 'GTCO.LG', name: 'Guaranty Trust Holdco', sector: 'Finance', market: 'NGX' },
+  { ticker: 'ZENITHBANK.LG', name: 'Zenith Bank', sector: 'Finance', market: 'NGX' },
+  { ticker: 'ACCESSCORP.LG', name: 'Access Holdings', sector: 'Finance', market: 'NGX' },
+  { ticker: 'AIRTELAFRI.LG', name: 'Airtel Africa', sector: 'Telecom', market: 'NGX' },
+  { ticker: 'BUACEMENT.LG', name: 'BUA Cement', sector: 'Materials', market: 'NGX' },
+  { ticker: 'SEPLAT.LG', name: 'Seplat Energy', sector: 'Energy', market: 'NGX' },
+  { ticker: 'UBA.LG', name: 'United Bank for Africa', sector: 'Finance', market: 'NGX' },
+  { ticker: 'FBNH.LG', name: 'FBN Holdings', sector: 'Finance', market: 'NGX' },
+  { ticker: 'STANBIC.LG', name: 'Stanbic IBTC Holdings', sector: 'Finance', market: 'NGX' },
+  { ticker: 'NESTLE.LG', name: 'Nestle Nigeria', sector: 'Consumer', market: 'NGX' },
+  { ticker: 'FLOURMILL.LG', name: 'Flour Mills Nigeria', sector: 'Consumer', market: 'NGX' },
+  // Hidden gems — smaller, less-followed stocks from the tweet
+  { ticker: 'BERGER.LG', name: 'Berger Paints Nigeria', sector: 'Materials', market: 'NGX', isHiddenGem: true },
+  { ticker: 'FIDSON.LG', name: 'Fidson Healthcare', sector: 'Healthcare', market: 'NGX', isHiddenGem: true },
+  { ticker: 'LEARNAFRI.LG', name: 'Learn Africa', sector: 'Education', market: 'NGX', isHiddenGem: true },
+  { ticker: 'UPDCREIT.LG', name: 'UPDC REIT', sector: 'Real Estate', market: 'NGX', isHiddenGem: true },
+  { ticker: 'ABCTRANS.LG', name: 'ABC Transport', sector: 'Transport', market: 'NGX', isHiddenGem: true },
+  { ticker: 'FTNCOCOA.LG', name: 'FTN Cocoa Processors', sector: 'Agriculture', market: 'NGX', isHiddenGem: true },
+  { ticker: 'CHAMS.LG', name: 'Chams Holding', sector: 'Technology', market: 'NGX', isHiddenGem: true },
+  { ticker: 'CAVERTON.LG', name: 'Caverton Offshore Support', sector: 'Energy', market: 'NGX', isHiddenGem: true },
+]
