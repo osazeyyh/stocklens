@@ -23,4 +23,8 @@ export const NGX_STOCKS: StockInfo[] = [
   { ticker: 'FTNCOCOA.LG', name: 'FTN Cocoa Processors', sector: 'Agriculture', market: 'NGX', isHiddenGem: true },
   { ticker: 'CHAMS.LG', name: 'Chams Holding', sector: 'Technology', market: 'NGX', isHiddenGem: true },
   { ticker: 'CAVERTON.LG', name: 'Caverton Offshore Support', sector: 'Energy', market: 'NGX', isHiddenGem: true },
+  { ticker: 'SCOA.LG', name: 'SCOA Nigeria', sector: 'Conglomerate', market: 'NGX', isHiddenGem: true },
+  { ticker: 'MECURE.LG', name: 'Mecure Industries', sector: 'Consumer', market: 'NGX', isHiddenGem: true },
+  { ticker: 'IEICOCHA.LG', name: 'IEIC', sector: 'Insurance', market: 'NGX', isHiddenGem: true },
+  { ticker: 'ZICHIS.LG', name: 'Zichis', sector: 'Consumer', market: 'NGX', isHiddenGem: true },
 ]

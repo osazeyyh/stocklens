@@ -32,6 +32,10 @@ const STOCK_SEEDS: Record<string, StockSeed> = {
   'FTNCOCOA.LG': { startPrice: 2.1, annualReturn: 0.63, volatility: 0.65, currency: 'NGN' },
   'CHAMS.LG': { startPrice: 0.8, annualReturn: 0.25, volatility: 0.70, currency: 'NGN' },
   'CAVERTON.LG': { startPrice: 1.5, annualReturn: 0.15, volatility: 0.58, currency: 'NGN' },
+  'SCOA.LG': { startPrice: 2.8, annualReturn: 0.46, volatility: 0.55, currency: 'NGN' },
+  'MECURE.LG': { startPrice: 3.5, annualReturn: 0.51, volatility: 0.52, currency: 'NGN' },
+  'IEICOCHA.LG': { startPrice: 0.9, annualReturn: 0.64, volatility: 0.68, currency: 'NGN' },
+  'ZICHIS.LG': { startPrice: 1.2, annualReturn: 0.52, volatility: 0.60, currency: 'NGN' },
   // US stocks (prices in USD)
   'NVDA': { startPrice: 45, annualReturn: 2.10, volatility: 0.60, currency: 'USD' },
   'AAPL': { startPrice: 165, annualReturn: 0.32, volatility: 0.25, currency: 'USD' },
