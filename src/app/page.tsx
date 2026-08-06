@@ -9,6 +9,7 @@ import { StockDetailDrawer } from '@/components/StockDetailDrawer'
 import { TooltipProvider } from '@/components/ui/Tooltip'
 import { DateRangePicker } from '@/components/DateRangePicker'
 import { formatCurrency } from '@/lib/format'
+import { convertCurrency } from '@/lib/fx'
 
 function toISODate(d: Date) {
   return d.toISOString().split('T')[0]
@@ -53,15 +54,15 @@ export default function Home() {
   }, [fetchStocks])
 
   function handleMarketChange(m: Market) {
-    setMarket(m)
     const nativeCurrency = m === 'NGX' ? 'NGN' : 'USD'
+    setAmount(Math.round(convertCurrency(amount, displayCurrency, nativeCurrency)))
+    setMarket(m)
     setDisplayCurrency(nativeCurrency)
-    setAmount(nativeCurrency === 'NGN' ? 10_000_000 : 10_000)
   }
 
   function handleCurrencyChange(c: 'NGN' | 'USD') {
+    setAmount(Math.round(convertCurrency(amount, displayCurrency, c)))
     setDisplayCurrency(c)
-    setAmount(c === 'NGN' ? 10_000_000 : 10_000)
   }
 
   function handleSelectStock(stock: StockResult) {
