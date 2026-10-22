@@ -15,6 +15,7 @@ import { subMonths, subYears, parseISO } from 'date-fns'
 import type { HistoricalPoint } from '@/types/stock'
 import { formatCurrency } from '@/lib/format'
 import { buildChartSeries } from '@/lib/calculations'
+import { SegmentedControl } from './ui/SegmentedControl'
 import type { ChartRange } from '@/types/stock'
 
 interface HistoricalChartProps {
@@ -23,13 +24,13 @@ interface HistoricalChartProps {
   currency: 'NGN' | 'USD'
 }
 
-const RANGES: { key: ChartRange; label: string }[] = [
-  { key: '1M', label: '1M' },
-  { key: '3M', label: '3M' },
-  { key: '6M', label: '6M' },
-  { key: '1Y', label: '1Y' },
-  { key: '3Y', label: '3Y' },
-  { key: '5Y', label: '5Y' },
+const RANGES: { value: ChartRange; label: string }[] = [
+  { value: '1M', label: '1M' },
+  { value: '3M', label: '3M' },
+  { value: '6M', label: '6M' },
+  { value: '1Y', label: '1Y' },
+  { value: '3Y', label: '3Y' },
+  { value: '5Y', label: '5Y' },
 ]
 
 function getRangeStart(range: ChartRange): Date {
@@ -78,28 +79,13 @@ export function HistoricalChart({ history, amount, currency }: HistoricalChartPr
 
   return (
     <div className="space-y-3">
-      <div className="flex gap-1">
-        {RANGES.map(r => (
-          <button
-            key={r.key}
-            onClick={() => setRange(r.key)}
-            className="px-3 py-1 rounded-lg text-xs font-medium transition-all"
-            style={{
-              background: range === r.key ? 'rgba(255,255,255,0.1)' : 'transparent',
-              color: range === r.key ? 'white' : 'var(--text-muted)',
-              border: range === r.key ? '1px solid rgba(255,255,255,0.15)' : '1px solid transparent',
-            }}
-          >
-            {r.label}
-          </button>
-        ))}
-      </div>
+      <SegmentedControl size="sm" options={RANGES} value={range} onChange={setRange} />
 
       <ResponsiveContainer width="100%" height={200}>
         <AreaChart data={sampled} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={color} stopOpacity={0.2} />
+              <stop offset="5%" stopColor={color} stopOpacity={0.12} />
               <stop offset="95%" stopColor={color} stopOpacity={0} />
             </linearGradient>
           </defs>
@@ -152,7 +138,9 @@ export function HistoricalChart({ history, amount, currency }: HistoricalChartPr
             type="monotone"
             dataKey="portfolioValue"
             stroke={color}
-            strokeWidth={2}
+            strokeWidth={1.5}
+            animationDuration={500}
+            animationEasing="ease-out"
             fill={`url(#${gradientId})`}
             dot={false}
             activeDot={{ r: 4, fill: color, stroke: 'var(--bg-base)', strokeWidth: 2 }}

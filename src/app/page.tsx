@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { MotionConfig } from 'framer-motion'
 import type { Market, Period, StockResult } from '@/types/stock'
 import { MarketPeriodToggle } from '@/components/MarketPeriodToggle'
 import { AmountInput } from '@/components/AmountInput'
@@ -8,7 +9,7 @@ import { StockGrid } from '@/components/StockGrid'
 import { StockDetailDrawer } from '@/components/StockDetailDrawer'
 import { TooltipProvider } from '@/components/ui/Tooltip'
 import { DateRangePicker } from '@/components/DateRangePicker'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, formatPercent } from '@/lib/format'
 import { convertCurrency } from '@/lib/fx'
 
 function toISODate(d: Date) {
@@ -73,121 +74,119 @@ export default function Home() {
   const topStock = stocks[0]
 
   return (
-    <TooltipProvider>
-      <main className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
-        {/* Header */}
-        <div
-          className="sticky top-0 z-20 px-5 py-4"
-          style={{
-            background: 'rgba(4,8,18,0.8)',
-            backdropFilter: 'blur(12px)',
-            borderBottom: '1px solid var(--border-color)',
-          }}
-        >
-          <div className="max-w-5xl mx-auto flex items-center justify-between">
-            <div>
-              <h1 className="text-lg font-bold text-white">StockLens</h1>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                NGX & US returns estimator
-              </p>
-            </div>
-            <div
-              className="text-xs px-3 py-1.5 rounded-full"
-              style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: '1px solid var(--border-color)' }}
-            >
-              Educational only
+    <MotionConfig reducedMotion="user">
+      <TooltipProvider>
+        <main className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
+          {/* Header */}
+          <div
+            className="sticky top-0 z-20 px-5 py-4"
+            style={{
+              background: 'rgba(4,8,18,0.8)',
+              backdropFilter: 'blur(12px)',
+              borderBottom: '1px solid var(--border-color)',
+            }}
+          >
+            <div className="max-w-5xl mx-auto flex items-center justify-between">
+              <div>
+                <h1 className="text-base font-semibold tracking-tight text-white">StockLens</h1>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                  NGX & US returns estimator
+                </p>
+              </div>
+              <div
+                className="text-xs px-3 py-1.5 rounded-full"
+                style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: '1px solid var(--border-color)' }}
+              >
+                Educational only
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-          {/* Amount input */}
-          <AmountInput
-            value={amount}
-            onChange={setAmount}
-            displayCurrency={displayCurrency}
-            onCurrencyChange={handleCurrencyChange}
-          />
+          <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+            {/* Amount input */}
+            <AmountInput
+              value={amount}
+              onChange={setAmount}
+              displayCurrency={displayCurrency}
+              onCurrencyChange={handleCurrencyChange}
+            />
 
-          {/* Top-stock teaser (only when data loaded) */}
-          {topStock && !loading && (
-            <div
-              className="rounded-2xl px-5 py-4"
-              style={{
-                background: 'linear-gradient(135deg, rgba(0,229,160,0.08), rgba(61,123,255,0.08))',
-                border: '1px solid rgba(0,229,160,0.2)',
-              }}
-            >
-              <p className="text-xs uppercase tracking-widest font-semibold mb-1" style={{ color: '#00E5A0' }}>
-                🏆 Top performer this period
-              </p>
-              <p className="text-white font-bold">
-                {topStock.name} would have turned your{' '}
-                <span style={{ color: '#00E5A0' }}>
-                  {formatCurrency(amount, displayCurrency)}
-                </span>{' '}
-                into{' '}
-                <span style={{ color: '#00E5A0' }}>
-                  {formatCurrency(Math.round(amount * topStock.historicalReturnFactor), displayCurrency)}
-                </span>{' '}
-                {period === 'custom' ? `from ${customFrom} to ${customTo}` : `over the last ${period}`} — a{' '}
-                <span style={{ color: '#00E5A0' }}>
-                  +{(topStock.historicalReturn * 100).toFixed(1)}% return
-                </span>
+            {/* Top-stock teaser (only when data loaded) */}
+            {topStock && !loading && (
+              <div
+                className="rounded-2xl px-5 py-4"
+                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)' }}
+              >
+                <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>
+                  Top performer {period === 'custom' ? `from ${customFrom} to ${customTo}` : `over the last ${period}`}
+                </p>
+                <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                  <span className="text-white font-medium">{topStock.name}</span> would have turned{' '}
+                  <span className="text-white tabular-nums">{formatCurrency(amount, displayCurrency)}</span> into{' '}
+                  <span className="text-white font-medium tabular-nums">
+                    {formatCurrency(Math.round(amount * topStock.historicalReturnFactor), displayCurrency)}
+                  </span>
+                  <span
+                    className="ml-2 text-sm font-medium tabular-nums"
+                    style={{ color: topStock.historicalReturn >= 0 ? 'var(--accent-green)' : 'var(--accent-red)' }}
+                  >
+                    {formatPercent(topStock.historicalReturn * 100)}
+                  </span>
+                </p>
+              </div>
+            )}
+
+            {/* Market + Period toggle */}
+            <MarketPeriodToggle
+              market={market}
+              period={period}
+              onMarketChange={handleMarketChange}
+              onPeriodChange={setPeriod}
+            />
+
+            {/* Custom date range picker */}
+            {period === 'custom' && (
+              <DateRangePicker
+                from={customFrom}
+                to={customTo}
+                onFromChange={setCustomFrom}
+                onToChange={setCustomTo}
+              />
+            )}
+
+            {/* Stock grid */}
+            <StockGrid
+              stocks={stocks}
+              amount={amount}
+              displayCurrency={displayCurrency}
+              isLoading={loading}
+              error={error}
+              onSelectStock={handleSelectStock}
+            />
+
+            {/* Disclaimer */}
+            <div className="text-center py-4">
+              <p className="text-xs max-w-lg mx-auto leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                Returns shown are historical and calculated from Yahoo Finance data.
+                Past performance does not guarantee future results.
+                This tool is for educational purposes only — not financial advice.
+                {displayCurrency !== (market === 'NGX' ? 'NGN' : 'USD') && (
+                  <> Currency conversion uses an approximate rate and is for reference only.</>
+                )}
               </p>
             </div>
-          )}
+          </div>
 
-          {/* Market + Period toggle */}
-          <MarketPeriodToggle
-            market={market}
-            period={period}
-            onMarketChange={handleMarketChange}
-            onPeriodChange={setPeriod}
-          />
-
-          {/* Custom date range picker */}
-          {period === 'custom' && (
-            <DateRangePicker
-              from={customFrom}
-              to={customTo}
-              onFromChange={setCustomFrom}
-              onToChange={setCustomTo}
-            />
-          )}
-
-          {/* Stock grid */}
-          <StockGrid
-            stocks={stocks}
+          {/* Detail drawer */}
+          <StockDetailDrawer
+            stock={selectedStock}
             amount={amount}
             displayCurrency={displayCurrency}
-            isLoading={loading}
-            error={error}
-            onSelectStock={handleSelectStock}
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
           />
-
-          {/* Disclaimer */}
-          <div className="text-center py-4">
-            <p className="text-xs max-w-lg mx-auto leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Returns shown are historical and calculated from Yahoo Finance data.
-              Past performance does not guarantee future results.
-              This tool is for educational purposes only — not financial advice.
-              {displayCurrency !== (market === 'NGX' ? 'NGN' : 'USD') && (
-                <> Currency conversion uses an approximate rate and is for reference only.</>
-              )}
-            </p>
-          </div>
-        </div>
-
-        {/* Detail drawer */}
-        <StockDetailDrawer
-          stock={selectedStock}
-          amount={amount}
-          displayCurrency={displayCurrency}
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-        />
-      </main>
-    </TooltipProvider>
+        </main>
+      </TooltipProvider>
+    </MotionConfig>
   )
 }

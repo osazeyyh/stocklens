@@ -19,9 +19,9 @@ interface StockGridProps {
 
 const FILTERS: { key: Filter; label: string }[] = [
   { key: 'all', label: 'All' },
-  { key: 'quick-trade', label: '⚡ Quick Trades' },
-  { key: 'long-hold', label: '🏦 Long Hold' },
-  { key: 'hidden-gem', label: '💎 Hidden Gems' },
+  { key: 'quick-trade', label: 'Quick trades' },
+  { key: 'long-hold', label: 'Long holds' },
+  { key: 'hidden-gem', label: 'Hidden gems' },
 ]
 
 export function StockGrid({ stocks, amount, displayCurrency, isLoading, error, onSelectStock }: StockGridProps) {
@@ -37,21 +37,17 @@ export function StockGrid({ stocks, amount, displayCurrency, isLoading, error, o
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
+            aria-pressed={filter === f.key}
             className={cn(
-              'px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200',
+              'px-3.5 py-1.5 rounded-full text-sm font-medium transition-[background-color,color,transform] duration-150 ease-out active:scale-[0.97]',
               filter === f.key
-                ? 'text-white'
+                ? 'bg-white/10 text-white'
                 : 'text-[#8B9BB4] hover:text-white',
             )}
-            style={
-              filter === f.key
-                ? { background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)' }
-                : { background: 'transparent', border: '1px solid transparent' }
-            }
           >
             {f.label}
             {f.key !== 'all' && !isLoading && (
-              <span className="ml-1.5 text-xs opacity-60">
+              <span className="ml-1.5 text-xs tabular-nums opacity-50">
                 {stocks.filter(s => s.tag === f.key).length}
               </span>
             )}

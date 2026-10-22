@@ -2,6 +2,7 @@
 
 import * as SliderPrimitive from '@radix-ui/react-slider'
 import { cn } from '@/lib/utils'
+import { SegmentedControl } from './ui/SegmentedControl'
 
 interface AmountInputProps {
   value: number
@@ -61,41 +62,30 @@ export function AmountInput({ value, onChange, displayCurrency, onCurrencyChange
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 space-y-1 min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
-            If you invested
-          </p>
+          <label htmlFor="amount" className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            If you had invested
+          </label>
           <input
+            id="amount"
             type="text"
+            inputMode="numeric"
             value={formatInput(value, displayCurrency)}
             onChange={handleInput}
-            className="w-full bg-transparent text-4xl font-bold tracking-tight outline-none"
+            className="w-full bg-transparent text-3xl sm:text-4xl font-semibold tracking-tight tabular-nums outline-none focus-visible:outline-none"
             style={{ color: 'var(--text-primary)' }}
           />
         </div>
 
-        {/* Currency toggle */}
-        <div
-          className="flex rounded-xl p-1 gap-1 shrink-0 mt-5"
-          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-color)' }}
-        >
-          {(['NGN', 'USD'] as const).map(c => (
-            <button
-              key={c}
-              onClick={() => onCurrencyChange(c)}
-              className={cn(
-                'px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200',
-                displayCurrency === c ? 'text-[#040812]' : 'text-[#8B9BB4] hover:text-white',
-              )}
-              style={
-                displayCurrency === c
-                  ? { background: 'linear-gradient(135deg, #00E5A0, #3D7BFF)' }
-                  : {}
-              }
-            >
-              {c === 'NGN' ? '₦' : '$'}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          size="sm"
+          className="shrink-0 mt-6"
+          options={[
+            { value: 'NGN', label: '₦' },
+            { value: 'USD', label: '$' },
+          ]}
+          value={displayCurrency}
+          onChange={onCurrencyChange}
+        />
       </div>
 
       {/* Logarithmic slider */}
@@ -108,21 +98,18 @@ export function AmountInput({ value, onChange, displayCurrency, onCurrencyChange
         className="relative flex items-center w-full h-6 cursor-pointer"
       >
         <SliderPrimitive.Track
-          className="relative grow rounded-full h-1.5"
+          className="relative grow rounded-full h-1"
           style={{ background: 'var(--bg-elevated)' }}
         >
-          <SliderPrimitive.Range
-            className="absolute h-full rounded-full"
-            style={{ background: 'linear-gradient(90deg, #00E5A0, #3D7BFF)' }}
-          />
+          <SliderPrimitive.Range className="absolute h-full rounded-full bg-white" />
         </SliderPrimitive.Track>
         <SliderPrimitive.Thumb
-          className="block w-5 h-5 rounded-full shadow-lg outline-none focus:ring-2 focus:ring-[#00E5A0] transition-transform hover:scale-110"
-          style={{ background: '#ffffff' }}
+          aria-label="Amount"
+          className="block w-5 h-5 rounded-full bg-white shadow-[0_1px_4px_rgba(0,0,0,0.4)] outline-none focus-visible:ring-4 focus-visible:ring-white/20 transition-transform duration-150 ease-out active:scale-110"
         />
       </SliderPrimitive.Root>
 
-      <div className="flex items-center justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
+      <div className="flex items-center justify-between text-xs tabular-nums" style={{ color: 'var(--text-muted)' }}>
         <span>{symbol}{(min / 1000).toFixed(0)}K</span>
         <span>{symbol}{(max / 1_000_000) >= 1 ? `${max / 1_000_000}M` : `${max / 1_000}K`}</span>
       </div>
@@ -133,12 +120,12 @@ export function AmountInput({ value, onChange, displayCurrency, onCurrencyChange
           <button
             key={amt}
             onClick={() => onChange(amt)}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-            style={{
-              background: value === amt ? 'rgba(0,229,160,0.15)' : 'var(--bg-elevated)',
-              color: value === amt ? '#00E5A0' : 'var(--text-secondary)',
-              border: `1px solid ${value === amt ? 'rgba(0,229,160,0.4)' : 'var(--border-color)'}`,
-            }}
+            className={cn(
+              'px-3 py-1.5 rounded-lg text-xs font-medium tabular-nums transition-[background-color,color,transform] duration-150 ease-out active:scale-[0.97]',
+              value === amt
+                ? 'bg-white/10 text-white'
+                : 'bg-[var(--bg-elevated)] text-[#8B9BB4] hover:text-white',
+            )}
           >
             {displayCurrency === 'NGN'
               ? amt >= 1_000_000 ? `₦${amt / 1_000_000}M` : `₦${amt / 1_000}K`

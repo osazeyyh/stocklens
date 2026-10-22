@@ -14,30 +14,18 @@ const LABEL_COLORS = {
 
 export function ConfidenceBar({ confidence, compact = false }: ConfidenceBarProps) {
   const color = LABEL_COLORS[confidence.label]
-  const bgColor =
-    confidence.label === 'High'
-      ? 'rgba(0,229,160,0.15)'
-      : confidence.label === 'Medium'
-      ? 'rgba(255,184,0,0.15)'
-      : 'rgba(255,77,106,0.15)'
 
   if (compact) {
     return (
       <div className="flex items-center gap-2">
         <div className="flex-1 h-1.5 rounded-full" style={{ background: 'var(--bg-elevated)' }}>
           <div
-            className="h-full rounded-full transition-all duration-700"
+            className="h-full rounded-full"
             style={{ width: `${confidence.score}%`, background: color }}
           />
         </div>
-        <span className="text-xs font-semibold tabular-nums" style={{ color, minWidth: 32 }}>
-          {confidence.score}%
-        </span>
-        <span
-          className="text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide"
-          style={{ background: bgColor, color }}
-        >
-          {confidence.label}
+        <span className="text-xs tabular-nums" style={{ color: 'var(--text-secondary)' }}>
+          <span className="font-medium" style={{ color }}>{confidence.label}</span> · {confidence.score}
         </span>
       </div>
     )
@@ -50,20 +38,17 @@ export function ConfidenceBar({ confidence, compact = false }: ConfidenceBarProp
           <EducationCard term="confidence">Confidence</EducationCard>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm font-bold tabular-nums" style={{ color }}>
-            {confidence.score}%
-          </span>
-          <span
-            className="text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wide"
-            style={{ background: bgColor, color }}
-          >
+          <span className="text-sm font-medium" style={{ color }}>
             {confidence.label}
+          </span>
+          <span className="text-sm tabular-nums" style={{ color: 'var(--text-secondary)' }}>
+            {confidence.score}/100
           </span>
         </div>
       </div>
-      <div className="h-2 rounded-full" style={{ background: 'var(--bg-elevated)' }}>
+      <div className="h-1.5 rounded-full" style={{ background: 'var(--bg-elevated)' }}>
         <div
-          className="h-full rounded-full transition-all duration-700"
+          className="h-full rounded-full transition-[width] duration-500 ease-out"
           style={{ width: `${confidence.score}%`, background: color }}
         />
       </div>

@@ -15,7 +15,7 @@ export function DateRangePicker({ from, to, onFromChange, onToChange }: DateRang
       className="flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-2xl px-5 py-4"
       style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)' }}
     >
-      <p className="text-xs font-semibold uppercase tracking-widest shrink-0" style={{ color: 'var(--text-muted)' }}>
+      <p className="text-sm shrink-0" style={{ color: 'var(--text-secondary)' }}>
         Date range
       </p>
 
@@ -50,10 +50,9 @@ function DateInput({
         min={min}
         max={max}
         onChange={e => onChange(e.target.value)}
-        className="rounded-lg px-3 py-1.5 text-sm text-white outline-none transition-colors"
+        className="rounded-lg px-3 py-1.5 text-sm tabular-nums text-white outline-none border border-[var(--border-color)] transition-colors duration-150 focus:border-white/30"
         style={{
           background: 'var(--bg-elevated)',
-          border: '1px solid var(--border-color)',
           colorScheme: 'dark',
         }}
       />

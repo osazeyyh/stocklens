@@ -51,21 +51,16 @@ export function StockDetailDrawer({ stock, amount, displayCurrency, open, onClos
   return (
     <Dialog.Root open={open} onOpenChange={o => !o && onClose()}>
       <Dialog.Portal>
-        <Dialog.Overlay
-          className="fixed inset-0 z-40"
-          style={{ background: 'rgba(4,8,18,0.85)', backdropFilter: 'blur(4px)' }}
-        />
+        <Dialog.Overlay className="drawer-overlay fixed inset-0 z-40" style={{ background: 'rgba(4,8,18,0.7)' }} />
         <Dialog.Content
-          className="fixed z-50 flex flex-col overflow-y-auto"
+          aria-describedby={undefined}
+          className="drawer-content fixed z-50 inset-x-0 bottom-0 mx-auto w-full max-w-2xl flex flex-col overflow-y-auto overscroll-contain will-change-transform"
           style={{
             background: 'var(--bg-surface)',
             border: '1px solid var(--border-color)',
-            borderRadius: '24px 24px 0 0',
-            bottom: 0,
-            left: 0,
-            right: 0,
+            borderBottom: 'none',
+            borderRadius: '20px 20px 0 0',
             maxHeight: '92vh',
-            // Desktop: side panel
           }}
         >
           {/* Drag handle */}
@@ -77,15 +72,15 @@ export function StockDetailDrawer({ stock, amount, displayCurrency, open, onClos
             {/* Header */}
             <div className="flex items-start justify-between pt-2">
               <div>
-                <Dialog.Title className="text-xl font-bold text-white">{stock.name}</Dialog.Title>
+                <Dialog.Title className="text-xl font-semibold tracking-tight text-white">{stock.name}</Dialog.Title>
                 <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
                   {stock.ticker} · {stock.sector}
                 </p>
               </div>
               <Dialog.Close asChild>
                 <button
-                  className="rounded-full p-2 transition-colors hover:bg-[rgba(255,255,255,0.08)]"
-                  style={{ color: 'var(--text-muted)' }}
+                  aria-label="Close"
+                  className="rounded-full p-2 -mr-2 text-[#8B9BB4] transition-[background-color,color,transform] duration-150 ease-out hover:bg-white/5 hover:text-white active:scale-[0.97]"
                 >
                   <X size={20} />
                 </button>
@@ -93,29 +88,23 @@ export function StockDetailDrawer({ stock, amount, displayCurrency, open, onClos
             </div>
 
             {/* Return summary */}
-            <div
-              className="rounded-2xl p-4 space-y-1"
-              style={{
-                background: isPositive ? 'rgba(0,229,160,0.06)' : 'rgba(255,77,106,0.06)',
-                border: `1px solid ${isPositive ? 'rgba(0,229,160,0.2)' : 'rgba(255,77,106,0.2)'}`,
-              }}
-            >
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+            <div className="space-y-1">
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                 Your {formatCurrency(amount, displayCurrency)} would have become
               </p>
-              <p className="text-3xl font-bold text-white tabular-nums">
+              <p className="text-4xl font-semibold tracking-tight text-white tabular-nums">
                 {formatCurrency(projectedValue, displayCurrency)}
               </p>
               <div className="flex items-center gap-2 flex-wrap">
                 <span
-                  className="flex items-center gap-1 text-sm font-semibold"
+                  className="flex items-center gap-1 text-sm font-medium tabular-nums"
                   style={{ color: isPositive ? '#00E5A0' : '#FF4D6A' }}
                 >
                   {isPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                   {formatPercent(stock.historicalReturn * 100)} over this period
                 </span>
-                <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                  ({isPositive ? '+' : ''}{formatCurrency(Math.abs(gain), displayCurrency, true)})
+                <span className="text-sm tabular-nums" style={{ color: 'var(--text-muted)' }}>
+                  ({isPositive ? '+' : '-'}{formatCurrency(Math.abs(gain), displayCurrency, true)})
                 </span>
               </div>
             </div>
@@ -125,7 +114,7 @@ export function StockDetailDrawer({ stock, amount, displayCurrency, open, onClos
 
             {/* Chart */}
             <div>
-              <h3 className="text-sm font-semibold text-white mb-3">Price History</h3>
+              <h3 className="text-sm font-medium text-white mb-3">Price history</h3>
               {loading && <Skeleton className="h-48 w-full" />}
               {!loading && detail && (
                 <HistoricalChart history={detail.historical} amount={amount} currency={stock.currency} />

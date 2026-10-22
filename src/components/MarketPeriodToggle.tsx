@@ -1,7 +1,7 @@
 'use client'
 
-import { cn } from '@/lib/utils'
 import type { Market, Period } from '@/types/stock'
+import { SegmentedControl } from './ui/SegmentedControl'
 
 interface MarketPeriodToggleProps {
   market: Market
@@ -10,8 +10,20 @@ interface MarketPeriodToggleProps {
   onPeriodChange: (p: Period) => void
 }
 
-const MONTH_PERIODS: Period[] = ['1M', '3M', '6M']
-const YEAR_PERIODS: Period[] = ['1Y', '3Y', '5Y']
+const MARKETS: { value: Market; label: string }[] = [
+  { value: 'NGX', label: 'NGX' },
+  { value: 'US', label: 'US' },
+]
+
+const PERIODS: { value: Period; label: string }[] = [
+  { value: '1M', label: '1M' },
+  { value: '3M', label: '3M' },
+  { value: '6M', label: '6M' },
+  { value: '1Y', label: '1Y' },
+  { value: '3Y', label: '3Y' },
+  { value: '5Y', label: '5Y' },
+  { value: 'custom', label: 'Custom' },
+]
 
 export function MarketPeriodToggle({
   market,
@@ -21,79 +33,13 @@ export function MarketPeriodToggle({
 }: MarketPeriodToggleProps) {
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-      {/* Market selector */}
-      <div
-        className="flex rounded-xl p-1 gap-1"
-        style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)' }}
-      >
-        {(['NGX', 'US'] as Market[]).map(m => (
-          <button
-            key={m}
-            onClick={() => onMarketChange(m)}
-            className={cn(
-              'px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200',
-              market === m
-                ? 'text-[#040812] shadow-sm'
-                : 'text-[#8B9BB4] hover:text-white',
-            )}
-            style={
-              market === m
-                ? { background: 'linear-gradient(135deg, #00E5A0, #3D7BFF)', color: '#040812' }
-                : {}
-            }
-          >
-            {m === 'NGX' ? '🇳🇬 NGX' : '🇺🇸 US Markets'}
-          </button>
-        ))}
-      </div>
-
-      {/* Period selector */}
-      <div
-        className="flex rounded-xl p-1 gap-1 items-center"
-        style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)' }}
-      >
-        {MONTH_PERIODS.map(p => (
-          <button
-            key={p}
-            onClick={() => onPeriodChange(p)}
-            className={cn(
-              'px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
-              period === p
-                ? 'bg-[rgba(255,255,255,0.1)] text-white'
-                : 'text-[#8B9BB4] hover:text-white',
-            )}
-          >
-            {p}
-          </button>
-        ))}
-        <div className="w-px h-4 mx-0.5 shrink-0" style={{ background: 'var(--border-color)' }} />
-        {YEAR_PERIODS.map(p => (
-          <button
-            key={p}
-            onClick={() => onPeriodChange(p)}
-            className={cn(
-              'px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
-              period === p
-                ? 'bg-[rgba(255,255,255,0.1)] text-white'
-                : 'text-[#8B9BB4] hover:text-white',
-            )}
-          >
-            {p}
-          </button>
-        ))}
-        <div className="w-px h-4 mx-0.5 shrink-0" style={{ background: 'var(--border-color)' }} />
-        <button
-          onClick={() => onPeriodChange('custom')}
-          className={cn(
-            'px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
-            period === 'custom'
-              ? 'bg-[rgba(255,255,255,0.1)] text-white'
-              : 'text-[#8B9BB4] hover:text-white',
-          )}
-        >
-          Custom
-        </button>
-      </div>
+      <SegmentedControl options={MARKETS} value={market} onChange={onMarketChange} />
+      <SegmentedControl
+        options={PERIODS}
+        value={period}
+        onChange={onPeriodChange}
+        className="max-w-full overflow-x-auto"
+      />
     </div>
   )
 }
